@@ -20,7 +20,7 @@ export function createStudent(data) {
                 .catch(err => Promise.reject(err.message));
 }
 export function updateStudent(data, id) {
-        return axios.post(`${BASE_URL}/student/update/${id}`, { data })
+        return axios.put(`${BASE_URL}/account/update/${id}`, { data })
                 .then(response => {
                         return response.data
                 })

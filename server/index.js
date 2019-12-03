@@ -10,7 +10,7 @@ const create  = require('./accounts/accounts');
 // const retrieveAll = require('./events/retrieveAll');
 // const retrieveByTitle = require('./events/retrieveByTitle')
 // const remove = require('./accounts/delete');
-const update = require('./accounts/update');
+// const update = require('./accounts/update');
 const retrieveAccounts = require('./accounts/retrieveAccounts')
 const account = require("./models/accounts");
 const bodyParser = require('body-parser')
@@ -20,7 +20,7 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-mongoose.connect('mongodb://localhost:27017/UserAccounts', {
+mongoose.connect('mongodb://localhost:27017/PN', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -90,8 +90,12 @@ app.delete('/account/delete/:id', (req,res) => {
   });
 });
 
-app.put('/account/update', (req, res) => {
-  update.update(req, res);
+app.put('/account/update/:id', (req, res) => {
+  let options = { new: true };
+  account.findByIdAndUpdate(req.params.id, req.body.data , options, (err, accounts) => {
+    if (err) return res.status(404).send({message: err.message});
+    return res.send({ message: 'accounts updated!', accounts });
+  });
 })
 
 

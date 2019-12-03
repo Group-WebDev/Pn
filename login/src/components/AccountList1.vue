@@ -34,7 +34,7 @@
                                 <v-card-actions>
                                     <v-spacer />
                                     <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-                                    <v-btn :disabled="!valid" color="success" class="mr-4" @click="create">
+                                    <v-btn :disabled="!valid" color="success" class="mr-4" @click="formActions">
                                         Add Account
                                     </v-btn>
                                 </v-card-actions>
@@ -65,7 +65,7 @@ import {
 import {
     getStudents,
     deleteStudent,
-    // updateStudent
+    updateStudent
 } from '@/axios/axios.js'
 export default {
     components: {
@@ -73,7 +73,7 @@ export default {
     },
     data() {
         return {
-            
+            add: true,
             search: '',
             students: [],
             dialog: false,
@@ -151,11 +151,11 @@ export default {
                 v => !!v || 'This is Required Field'
             ],
         }
-    }, 
+    },
     mounted() {
-            getStudents()
-                .then(data => this.students = data.data)
-                .catch((err => alert(err)));
+        getStudents()
+            .then(data => this.students = data.data)
+            .catch((err => alert(err)));
     },
     methods: {
         deleteStudent(items) {
@@ -164,11 +164,13 @@ export default {
             deleteStudent(student._id)
                 .then(() => {
                     this.$emit('deleteStudent', student._id);
+                    confirm('Are you sure you want to delete this item?') && this.students.splice(index, 1)
                 })
                 .catch(err => alert(err.message));
-            confirm('Are you sure you want to delete this item?') && this.students.splice(index, 1)
+            
         },
         editStudent(item) {
+            this.add = false
             this.editedIndex = this.students.indexOf(item)
             this.editedItem = Object.assign({}, item)
             this.dialog = true
@@ -191,14 +193,42 @@ export default {
             createStudent(data)
                 .then(data => {
                     this.$emit('createStudent', data.data);
-                    this.email =this.firstname = this.lastname = this.middlename =  this.password = this.username = this.fullname = this.batch = '';
+                    this.email = this.firstname = this.lastname = this.middlename = this.password = this.username = this.fullname = this.batch = '';
                     this.dialog = false;
                 })
                 .catch(err => alert(err.message));
         },
+        update() {
+            let data = {
+                firstname: this.editedItem.firstname,
+                lastname: this.editedItem.lastname,
+                middlename: this.editedItem.middlename,
+                batch: this.editedItem.batch,
+                username: this.editedItem.username,
+                email: this.editedItem.email,
+                password: this.editedItem.password
+            };
+            updateStudent(data, this._id)
+                .then(data => {
+                    this.$emit("updateStudent", data.data);
+                    console.log(data.data);
+                    Object.assign(this.students[this.editedIndex], data.data);
+                    this.close();
+                })
+                .catch(err => alert(err.error));
+        },
+
+        formActions(){
+            if(this.add == true){
+                this.create()
+            }
+            else{
+                this.update()
+            }
+        }
     },
-       
-    }
+
+}
 </script>
 
 <style>
