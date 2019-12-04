@@ -4,7 +4,7 @@ var Schema = new mongoose.Schema({
     firstname: {type:String},
     lastname:{type:String},
     middlename:{type:String},
-    batch:{type:String},
+    batch:{type:Number},
     email: {type: String, unique:true},
     username:{type:String, unique:true},
     password:{type:String, required:true}

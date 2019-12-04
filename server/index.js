@@ -92,9 +92,9 @@ app.delete('/account/delete/:id', (req,res) => {
 
 app.put('/account/update/:id', (req, res) => {
   let options = { new: true };
-  account.findByIdAndUpdate(req.params.id, req.body.data , options, (err, accounts) => {
+  account.findByIdAndUpdate(req.params.id, req.body.data , options, (err, note) => {
     if (err) return res.status(404).send({message: err.message});
-    return res.send({ message: 'accounts updated!', accounts });
+    return res.send({ message: 'note updated!', note });
   });
 })
 

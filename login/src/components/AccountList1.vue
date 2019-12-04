@@ -17,19 +17,19 @@
                             </v-card-title>
                             <v-form ref="form" v-model="valid" @submit.prevent="create">
 
-                                <v-text-field v-model="editedItem.firstname" :rules="requiredRules" label="First Name" required></v-text-field>
+                                <v-text-field v-model="firstname" :rules="nameRules" label="First Name" required></v-text-field>
 
-                                <v-text-field v-model="editedItem.lastname" :rules="requiredRules" label="Last Name" required></v-text-field>
+                                <v-text-field v-model="lastname" :rules="nameRules" label="Last Name" required></v-text-field>
 
-                                <v-text-field v-model="editedItem.middlename" :rules="requiredRules" label="Last Name" required></v-text-field>
+                                <v-text-field v-model="middlename" :rules="nameRules" label="Last Name" required></v-text-field>
 
-                                <v-text-field v-model="editedItem.batch" :rules="requiredRules" label="Batch" required></v-text-field>
+                                <v-text-field v-model="batch" :rules="batchRules" label="Batch" required></v-text-field>
 
-                                <v-text-field v-model="editedItem.username" :rules="requiredRules" label="Username" required></v-text-field>
+                                <v-text-field v-model="username" :rules="nameRules" label="Username" required></v-text-field>
 
-                                <v-text-field v-model="editedItem.email" :rules="emailRules" label="E-mail" required></v-text-field>
+                                <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
 
-                                <v-text-field v-model="editedItem.password" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :rules="paswordRules" :type="show2 ? 'text' : 'password'" name="input-10-2" label="Password" hint="At least 8 characters" class="input-group--focused" @click:append="show2 = !show2"></v-text-field>
+                                <v-text-field v-model="password" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :rules="paswordRules" :type="show2 ? 'text' : 'password'" name="input-10-2" label="Password" hint="At least 8 characters" class="input-group--focused" @click:append="show2 = !show2"></v-text-field>
 
                                 <v-card-actions>
                                     <v-spacer />
@@ -113,43 +113,33 @@ export default {
                     sortable: false
                 },
             ],
+            studentId:0,
             editedIndex: -1,
-            editedItem: {
-                firstname: '',
-                lastname: '',
-                middlename: '',
-                batch: '',
-                username: '',
-                email: '',
-                password: '',
-            },
-            defaultItem: {
-                firstname: '',
-                lname: '',
-                middlename: '',
-                batch: '',
-                username: '',
-                email: '',
-                password: '',
-            },
-            show2: false,
-            valid: true,
-            fullname: '',
+            firstname: '',
+            lastname: '',
+            middlename: '',
             batch: '',
             username: '',
+            email: '',
             password: '',
+            show2: false,
+            valid: true,
             paswordRules: [
                 v => !!v || 'Password is required',
                 v => /^([a-zA-Z0-9@*#]{8,15})$/.test(v) || 'Password matching expression. Match all alphanumeric character and predefined wild characters. Password must consists of at least 8 characters and not more than 15 characters.',
             ],
-            email: '',
             emailRules: [
                 v => !!v || 'E-mail is required',
                 v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
             ],
-            requiredRules: [
-                v => !!v || 'This is Required Field'
+            batchRules: [
+                v => !!v || 'This is Required Field',
+                v => /^[0-9]*$/.test(v) || 'This Field should be a number',
             ],
+            nameRules:[
+                v => !!v || 'This is Required Field',
+                v => /^[a-zA-Z]*$/.test(v) || 'This field should contain only Letters',
+            ]
         }
     },
     mounted() {
@@ -167,12 +157,19 @@ export default {
                     confirm('Are you sure you want to delete this item?') && this.students.splice(index, 1)
                 })
                 .catch(err => alert(err.message));
-            
+
         },
         editStudent(item) {
             this.add = false
+            this.firstname = item.firstname;
+            this.lastname = item.lastname;
+            this.middlename = item.middlename
+            this.batch = item.batch,
+            this.username = item.username
+            this.email = item.email
+            this.studentId = item._id
+            this.password = item.password
             this.editedIndex = this.students.indexOf(item)
-            this.editedItem = Object.assign({}, item)
             this.dialog = true
         },
         validate() {
@@ -182,47 +179,51 @@ export default {
         },
         create: function () {
             let data = {
-                firstname: this.editedItem.firstname,
-                lastname: this.editedItem.lastname,
-                middlename: this.editedItem.middlename,
-                batch: this.editedItem.batch,
-                username: this.editedItem.username,
-                email: this.editedItem.email,
-                password: this.editedItem.password
+                firstname: this.firstname,
+                lastname: this.lastname,
+                middlename: this.middlename,
+                batch: this.batch,
+                username: this.username,
+                email: this.email,
+                password: this.password
             }
             createStudent(data)
                 .then(data => {
                     this.$emit('createStudent', data.data);
+                    getStudents()
+                        .then(data => this.students = data.data)
+                        .catch((err => alert(err)));
                     this.email = this.firstname = this.lastname = this.middlename = this.password = this.username = this.fullname = this.batch = '';
                     this.dialog = false;
                 })
                 .catch(err => alert(err.message));
         },
         update() {
+            window.console.log(this.studentId)
             let data = {
-                firstname: this.editedItem.firstname,
-                lastname: this.editedItem.lastname,
-                middlename: this.editedItem.middlename,
-                batch: this.editedItem.batch,
-                username: this.editedItem.username,
-                email: this.editedItem.email,
-                password: this.editedItem.password
+                firstname: this.firstname,
+                lastname: this.lastname,
+                middlename: this.middlename,
+                batch: this.batch,
+                username: this.username,
+                email: this.email,
+                password: this.password
             };
-            updateStudent(data, this._id)
+            updateStudent(data, this.studentId)
                 .then(data => {
-                    this.$emit("updateStudent", data.data);
-                    console.log(data.data);
-                    Object.assign(this.students[this.editedIndex], data.data);
-                    this.close();
+                    this.$emit("updateStudent", data.account);
+                    this.dialog = false;
+                    getStudents()
+                        .then(data => this.students = data.data)
+                        .catch((err => alert(err)));
+                    
                 })
-                .catch(err => alert(err.error));
         },
 
-        formActions(){
-            if(this.add == true){
+        formActions() {
+            if (this.add == true) {
                 this.create()
-            }
-            else{
+            } else {
                 this.update()
             }
         }
