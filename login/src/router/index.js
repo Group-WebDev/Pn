@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Accounts from "@/components/AccountList1.vue"
 import Account from "@/components/AccountList2.vue"
+import Analytics from '@/components/Analytics.vue'
 import store from '@/store'
 
 Vue.use(VueRouter);
@@ -42,6 +43,14 @@ const routes = [
     path: "/accounts2022",
     name: "accounts2022",
     component: Account,
+    meta:{
+      requiresAuth:true
+    }
+  },
+  {
+    path: "/analytics",
+    name: "analytics",
+    component:Analytics,
     meta:{
       requiresAuth:true
     }

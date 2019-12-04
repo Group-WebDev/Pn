@@ -22,7 +22,7 @@
         <v-divider></v-divider>
 
         <v-list dense>
-            <v-list-item link>
+            <v-list-item link  @click="analytics">
                 <v-list-item-action>
                     <v-icon>mdi-home</v-icon>
                 </v-list-item-action>
@@ -94,6 +94,9 @@ export default {
       },
       show2022(){
         this.$router.push('/accounts2022')
+      },
+      analytics(){
+          this.$router.push('/analytics')
       }
     },
     created: function () {
